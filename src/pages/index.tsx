@@ -51,12 +51,14 @@ export default function Home() {
 
   const handleSearch = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const response = await fetch(
-      API_PATHS.SEARCH_HEROES(query),
-    );
+    try {
+      const response = await fetch(API_PATHS.SEARCH_HEROES(query));
 
-    const { results } = await response.json();
-    setSuperheroes(results)
+      const { results } = await response.json();
+      setSuperheroes(results);
+    } catch (error) {
+      console.log("error", error)
+    }
   };
 
   return (
@@ -69,6 +71,7 @@ export default function Home() {
             onSubmit={handleSearch}
           >
             <input
+              required
               className="bg-slate-200 rounded text-lg"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -81,25 +84,27 @@ export default function Home() {
             </button>
           </form>
         </div>
-        <div className='flex flex-col space-y-5 overflow-x-auto h-full pb-12'>
-          {superheroes.length > 0 &&
+        <div className="flex flex-col space-y-5 overflow-x-auto h-full pb-12">
+          {superheroes && superheroes.length > 0 &&
             superheroes.map((hero: Superhero) => (
-                <Link
-                  href={`/profile/${hero.id}`}
-                  key={hero.id}
-                >
-                  <div className="flex items-center space-x-5 hover:bg-slate-200 rounded-full">
-                    <div className="rounded-full h-12 w-12 overflow-hidden">
-                      <Image
-                        height={50}
-                        width={50}
-                        src={hero.image.url}
-                        alt={hero.name}
-                      />
-                    </div>
-                    <div>{hero.name} <span className='text-sm text-gray-400'>{hero.biography.publisher}</span></div>
+              <Link href={`/profile/${hero.id}`} key={hero.id}>
+                <div className="flex items-center space-x-5 hover:bg-slate-200 rounded-full">
+                  <div className="rounded-full h-12 w-12 overflow-hidden">
+                    <Image
+                      height={50}
+                      width={50}
+                      src={hero.image.url}
+                      alt={hero.name}
+                    />
                   </div>
-                </Link>
+                  <div>
+                    {hero.name}{" "}
+                    <span className="text-sm text-gray-400">
+                      {hero.biography.publisher}
+                    </span>
+                  </div>
+                </div>
+              </Link>
             ))}
         </div>
       </main>
